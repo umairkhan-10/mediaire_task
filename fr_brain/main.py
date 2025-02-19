@@ -23,7 +23,7 @@ class FrBRAINProcessor:
     def __init__(self) -> None:
         self.running = True
 
-    def process_brain_scans(self):
+    def process_brain_scans(self) -> None:
         """Processes the brain scans nd generate report."""
         try:
             while self.running:
@@ -57,7 +57,7 @@ class FrBRAINProcessor:
         except Exception as e:
             logger.error(f"Exception in processing brain scans: {e}")
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the processing of brain scans."""
         self.running = False
 

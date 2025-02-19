@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from pydantic import BaseModel
 
@@ -24,11 +24,11 @@ class BaseDocument(BaseModel):
             data.pop("_id")
         return data
 
-    def insert(self, collection_name: str):
+    def insert(self, collection_name: str) -> Optional[str]:
         """Insert document into MongoDB."""
         return db_manager.insert(collection_name, self.to_bson())
 
-    def update(self, collection_name: str, query: Dict[str, Any]):
+    def update(self, collection_name: str, query: Dict[str, Any]) -> Optional[str]:
         """Update document in MongoDB."""
         return db_manager.update(collection_name, query, self.to_bson())
 

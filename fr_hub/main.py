@@ -23,7 +23,7 @@ class FrHUBClient:
         self.client_socket = None
         self.running = True
 
-    def send_brain_report(self):
+    def send_brain_report(self) -> None:
         """
         Sends brain reports to FrPACS.
         :return:
@@ -69,13 +69,13 @@ class FrHUBClient:
         finally:
             self.close_socket()
 
-    def close_socket(self):
+    def close_socket(self) -> None:
         """Closes the socket connection."""
         if self.client_socket:
             self.client_socket.close()
             self.client_socket = None
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
         self.close_socket()
 
@@ -156,7 +156,7 @@ class FrHUBServer:
             if self.server_socket:
                 self.server_socket.close()
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
         if self.server_socket:
             self.server_socket.close()

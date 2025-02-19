@@ -27,7 +27,7 @@ class FrPACSClient:
         self.client_socket = None
         self.running = True
 
-    def send_brain_scan(self):
+    def send_brain_scan(self) -> None:
         """
         Sends the brain scan
         :return:
@@ -79,13 +79,13 @@ class FrPACSClient:
         finally:
             self.close_socket()
 
-    def close_socket(self):
+    def close_socket(self) -> None:
         """Closes the socket connection."""
         if self.client_socket:
             self.client_socket.close()
             self.client_socket = None
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
         self.close_socket()
 
@@ -161,7 +161,7 @@ class FrPACSServer:
             if self.server_socket:
                 self.server_socket.close()
 
-    def stop(self):
+    def stop(self) -> None:
         self.running = False
         if self.server_socket:
             self.server_socket.close()

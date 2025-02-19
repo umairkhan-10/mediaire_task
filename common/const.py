@@ -15,3 +15,6 @@ class ReportStatus(StrEnum):
     to_do = "To Do"
     in_process = "In Process"
     done = "Done"
+
+
+MONGO_DB_URI = "mongodb://localhost:27017"

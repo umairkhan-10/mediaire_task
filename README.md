@@ -6,7 +6,7 @@ running
 
 You should also install Docker and it should be running as well (for running Unit Tests via Test Container)
 
-This project uses Python 3.10
+This project uses Python 3.12
 For all the other dependencies, please have a look at common/requirements.txt
 
 ### Steps to run Single Unit:
@@ -123,7 +123,7 @@ For validations, I have utilized pydantic for function parameters and return typ
 
 #### Threading
 
-Threading is being utilized to ensure that the system can run multiple operations concurrently
+Threading is being utilized to ensure that the system can run multiple operations concurrently.
 
 #### Black Formatter and isort
 
@@ -135,9 +135,11 @@ Utilized black code formatter to better format the code as well and also optimiz
 - We can introduce batch processing in both FrHUB and FrBRAIN to fetch and process data of scans and reports in batches
   instead of fetching single which increases our DB calls.
 - Implement a retry mechanism for handling errors gracefully in network communication.
+- We can implement locking mechanism to avoid handling of same data or objects by multiple threads
+- We should better implement Multi-Processing for FRBRAIN to create the reports in an optimized way.
 - Can implement authentication/encryption for DB connections.
 - Utilize better monitoring and logging tools like ELK, Prometheus, Grafana or Sentry etc.
 - Better and more unit tests for the system
 - We could introduce indexing in columns like scan_id, patient_id, report_generated etc.
 - I could use docker file but the scope and time of this task is limited so didn't use for this excercise.
-- Can also write more Unit Tests
+- Can also write more Unit Tests and can separate out each unit test cases as well.

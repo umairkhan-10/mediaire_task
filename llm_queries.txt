@@ -10,6 +10,7 @@
 
 - Make Python Class to follow a Singleton Pattern example, best practice
 - best practice for isolated DB dependent unit tests
+- How can I set up pytest fixtures to create and manage a MongoDB container for integration testing?
 - Best way to clean the database before each test run in pytest?
 - What am I missing in my Makefile
 - Run tests via Coverage and generate report

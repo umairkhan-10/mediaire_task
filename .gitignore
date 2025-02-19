@@ -9,6 +9,8 @@ __pycache__/
 
 # Ignore log files
 *.log
+.DS_Store
+
 
 # Ignore test cache
 *.pytest_cache/

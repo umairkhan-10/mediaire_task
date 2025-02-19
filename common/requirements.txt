@@ -1,0 +1,12 @@
+SQLAlchemy==2.0.38
+pika==1.3.2
+psycopg2-binary==2.9.10
+pika-stubs==0.1.3
+StrEnum==0.4.15
+pymongo==4.11.1
+pydantic==2.10.6
+testcontainers==4.9.1
+pytest==8.3.4
+coverage==7.6.12
+
+

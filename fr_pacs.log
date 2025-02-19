@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/umair/Documents/mediaire/mediaire_task/fr_pacs/main.py", line 8, in <module>
+    from common.logger import logger
+ModuleNotFoundError: No module named 'common'

@@ -1,0 +1,15 @@
+- Generates a random 10x10 ASCII art brain scan with random lesions ('o') in python
+
+    For example
+
+    _______ /\ /\ || |o| |o| \/ \_______/
+
+- Receive a "--server" argument from command line, python
+# as I have recently changed system so I had required some help in installing some services
+- Install MongoDB in Mac M1 Pro Apple chip
+
+- Make Python Class to follow a Singleton Pattern example, best practice
+- best practice for isolated DB dependent unit tests
+- Best way to clean the database before each test run in pytest?
+- What am I missing in my Makefile
+- Run tests via Coverage and generate report

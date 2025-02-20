@@ -1,4 +1,4 @@
-from fr_pacs.main import FrPACSClient
+from fr_pacs.client import FrPACSClient
 
 
 def test_fr_pacs_client_initialization():

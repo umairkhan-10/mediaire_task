@@ -1,6 +1,6 @@
 import time
 
-from common.const import ReportStatus, NeuroDataCollections
+from common.config import ReportStatus, NeuroDataCollections
 from fr_brain.main import run_brain_processor
 
 

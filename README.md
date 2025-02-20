@@ -49,7 +49,9 @@ persistent storage i.e. MongoDB)
 
 - **Fr-PACS**:
 
-  As per requriement, there is no need for any persistent storage in this unit, so no queue, DB etc is being used
+  As per requriement, there is no need for any persistent storage in this unit, so no need for non-persistent queue
+  or any persistent storage
+  etc is being used
   in this unit.
     - **Client**:
         - Responsible for generating and sending brain scans to Fr-HUB via sockets. Sockets is used for low latency,
@@ -134,9 +136,9 @@ Utilized black code formatter to better format the code as well and also optimiz
 - We should use critical credentials like MongoDB in some env file or probably AWS Secrets Manager to improve security.
 - We can introduce batch processing in both FrHUB and FrBRAIN to fetch and process data of scans and reports in batches
   instead of fetching single which increases our DB calls.
-- Implement a retry mechanism for handling errors gracefully in network communication.
+- We should better implement Multi-Processing for FRBRAIN to create the reports in a much optimized way.
+- CAn implement a retry mechanism for handling data/errors gracefully in network communication.
 - We can implement locking mechanism to avoid handling of same data or objects by multiple threads
-- We should better implement Multi-Processing for FRBRAIN to create the reports in an optimized way.
 - Can implement authentication/encryption for DB connections.
 - Utilize better monitoring and logging tools like ELK, Prometheus, Grafana or Sentry etc.
 - Better and more unit tests for the system

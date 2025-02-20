@@ -1,7 +1,7 @@
 import random as rn
 from datetime import datetime
 
-from common.const import NeuroDataCollections
+from common.config import NeuroDataCollections
 from common.db_manager import DBManager
 from common.logger import logger
 from common.models import BrainScan, BrainReport

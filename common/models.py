@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional
 
 from pydantic import BaseModel
 
-from common.const import ReportStatus
+from common.config import ReportStatus
 from common.db_manager import DBManager
 
 db_manager = DBManager()

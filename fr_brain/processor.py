@@ -46,7 +46,7 @@ class FrBRAINScanProcessor:
                             # Update the brain scan to mark it as processed
                             db_manager.update(
                                 NeuroDataCollections.brain_scans,
-                                {"scan_id": scan_data["scan_id"]},
+                                {"_id": scan_data["_id"]},
                                 {"report_generated": ReportStatus.done},
                             )
                     except Exception as e:
@@ -54,7 +54,7 @@ class FrBRAINScanProcessor:
                         db_manager.update(
                             NeuroDataCollections.brain_scans,
                             {"_id": scan_data["_id"]},  # Update this specific scan only
-                            {"$set": {"report_generated": ReportStatus.error}},
+                            {"report_generated": ReportStatus.error},
                         )
                 else:
                     logger.info("No pending scans to process. Waiting for scan...")

@@ -1,7 +1,7 @@
 import time
 
 from common.config import ReportStatus, NeuroDataCollections
-from fr_brain.main import run_brain_processor
+from fr_brain.processor import main as brain_scan_processor
 
 
 def test_fr_brain_processor_functionality(db_manager):
@@ -17,7 +17,7 @@ def test_fr_brain_processor_functionality(db_manager):
     db_manager.insert(NeuroDataCollections.brain_scans, scan_data)
 
     # Start the brain processor
-    brain_instance = run_brain_processor()
+    brain_instance = brain_scan_processor()
 
     # Allow some time for the brain processor to process the scan
     time.sleep(10)

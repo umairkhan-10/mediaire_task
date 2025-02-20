@@ -137,6 +137,8 @@ Utilized black code formatter to better format the code as well and also optimiz
 - We can introduce batch processing in both FrHUB and FrBRAIN to fetch and process data of scans and reports in batches
   instead of fetching single which increases our DB calls.
 - We should better implement Multi-Processing for FRBRAIN to create the reports in a much optimized way.
+- Better approach can be implemented in case FrBRAIN server stops and reports are still in In Process so have to update
+  those reports.
 - CAn implement a retry mechanism for handling data/errors gracefully in network communication.
 - We can implement locking mechanism to avoid handling of same data or objects by multiple threads
 - Can implement authentication/encryption for DB connections.

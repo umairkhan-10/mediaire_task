@@ -70,7 +70,7 @@ class DBManager:
     def update(self, collection_name: str, query: Dict, update_data: Dict) -> Optional[int]:
         try:
             collection = self.db[collection_name]
-            result = collection.update_one(query, update_data)
+            result = collection.update_one(query, {"$set": update_data})
             return result.modified_count
         except Exception as e:
             logger.error(f"Error updating document in {collection_name}: {e}")

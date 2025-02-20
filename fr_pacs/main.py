@@ -7,7 +7,6 @@ from server import main as brain_report_server
 if __name__ == "__main__":
     brain_scan_client = brain_scan_client()
     brain_report_server = brain_report_server()
-
     try:
         while True:
             threading.Event().wait(1)

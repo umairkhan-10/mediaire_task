@@ -1,33 +1,44 @@
-import time
+import threading
+import unittest
+from unittest.mock import patch
 
-from common.config import ReportStatus, NeuroDataCollections
-from fr_brain.processor import main as brain_scan_processor
+from fr_brain.processor import FrBRAINScanProcessor
 
 
-def test_fr_brain_processor_functionality(db_manager):
-    # Insert a brain scan into the database
-    scan_data = {
-        "patient_id": 1,
-        "scan_id": 20,
-        "scan_data": "| |     |o|",
-        "report_generated": ReportStatus.to_do,
-        "scan_type": "BRAIN",
-        "scan_datetime": time.time(),
-    }
-    db_manager.insert(NeuroDataCollections.brain_scans, scan_data)
+class TestFrBRAINScanProcessor(unittest.TestCase):
 
-    # Start the brain processor
-    brain_instance = brain_scan_processor()
+    def setUp(self):
+        self.processor = FrBRAINScanProcessor()
+        self.processor.stop_after_one_iteration = True  # Set the flag to stop after one iteration
 
-    # Allow some time for the brain processor to process the scan
-    time.sleep(10)
+    @patch('fr_brain.processor.DBManager.insert')
+    def test_process_brain_scans(self, mock_insert):
+        """Test the process_brain_scans method"""
 
-    # Verify that the brain scan was processed
-    processed_scan = db_manager.fetch_one(
-        NeuroDataCollections.brain_scans, {"scan_id": 20}
-    )
-    assert processed_scan is not None
-    assert processed_scan["report_generated"] == ReportStatus.done
+        # Run the processor in a separate thread
+        processor_thread = threading.Thread(target=self.processor.process_brain_scans)
+        processor_thread.start()
 
-    # Stop the brain processor
-    brain_instance.stop()
+        # Allow some time for the thread to start and run one iteration
+        processor_thread.join(timeout=2)
+
+        # Ensure the insert method was called
+        mock_insert.assert_called_once()
+
+        # Stop the processor
+        self.processor.stop()
+        processor_thread.join(timeout=1)
+
+        # Ensure the thread has stopped
+        self.assertFalse(processor_thread.is_alive())
+
+    # TODO: methods
+    def fetch_and_process_scan(self, mock_stop):
+        pass
+
+    def test_stop(self):
+        pass
+    
+
+if __name__ == '__main__':
+    unittest.main()

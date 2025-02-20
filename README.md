@@ -139,6 +139,10 @@ For validations, I have utilized pydantic for function parameters and return typ
 
 Threading is being utilized to ensure that the system can run multiple operations concurrently.
 
+#### Multi Processing
+
+Multi processing FrBRAINProcessor to efficently process large data simulaneously and effectively.
+
 #### Code Quality Tools
 
 - **Black**: Used for code formatting.
@@ -149,10 +153,8 @@ Threading is being utilized to ensure that the system can run multiple operation
 
 - Store sensitive credentials like MongoDB URI in some env file or probably AWS Secrets Manager.
 - Implement batch processing in Fr-HUB and Fr-BRAIN for fetching/processing to reduce the number of database calls.
-- Implement Multi-Processing in FRBRAIN to create the reports in a much more optimized way.
 - Handle the case, when FrBRAIN server stops and reports are stuck in 'In Process'.
 - Implement a retry mechanism for handling network communication errors gracefully.
-- Implement a locking mechanism to avoid handling of same data by multiple threads.
 - Can Implement authentication/encryption for DB connections.
 - Utilize monitoring and logging tools like ELK, Prometheus, Grafana or Sentry etc.
 - Better and more comprehensive unit test cases for the system.

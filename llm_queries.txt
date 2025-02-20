@@ -14,3 +14,4 @@
 - Best way to clean the database before each test run in pytest?
 - What am I missing in my Makefile
 - Run tests via Coverage and generate report
+- Format my Readme file

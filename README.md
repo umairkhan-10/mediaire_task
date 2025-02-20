@@ -1,49 +1,65 @@
-Pre reqs:
-You should also install Mongo DB service locally as for persistent storage we're using MongoDB, and make sure its
-running
-
-(e.g. You could query on any LLM on how to install MongoDB service in <System OS>)
-
-You should also install Docker and it should be running as well (for running Unit Tests via Test Container)
-
-This project uses Python 3.12
-For all the other dependencies, please have a look at common/requirements.txt
-
-### Steps to run Single Unit:
-
-#### 1: Create virtual env:
-
-* python3 -m venv venv
-
-#### 2: Activate virtual env
-
-* source venv/bin/activate
-
-#### 3: Install dependencies:
-
-* pip install -r common/requirements.txt
-
-#### 4: Run via Makefile:
-
-* make all
-  OR
-* make "command for individual unit"
-
-#### 4: Run Unitests:
-
-* make tests
-
-#### 4: Run Test Coverage:
-
-* make coverage
-
 # Fr-PACS, Fr-HUB, and Fr-BRAIN
 
 ## Overview
 
 This project consists of three independent software units: Fr-PACS, Fr-HUB, and Fr-BRAIN. These units communicate with
-each other one way or the other (FrPACS and FrHUB communicates via sockets while FrHUB and FrBRAIN communciates via
-persistent storage i.e. MongoDB)
+each other one way or the other (Fr-PACS and Fr-HUB communicate via sockets while Fr-HUB and Fr-BRAIN communicate via
+persistent storage i.e. MongoDB).
+
+## Prerequisites
+
+- **MongoDB**: Install MongoDB service locally as we are using MongoDB for persistent storage due to its flexibility,
+  documented format, and scalability. Make sure it's
+  running. [MongoDB Installation Instructions](https://docs.mongodb.com/manual/installation/)
+
+- **Docker**: Docker should be installed and running as well (for running Unit Tests via Test
+  Container). [Docker Installation Instructions](https://docs.docker.com/get-docker/)
+- This project uses **Python 3.12**.
+  For all other dependencies, please refer to `common/requirements.txt`.
+
+### 1. Create a Virtual Environment
+
+```sh
+python3 -m venv venv
+```
+
+### 2. Activate the Virtual Environment
+
+```sh
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```sh
+pip install -r common/requirements.txt
+```
+
+### 4. Run via Makefile
+
+To run all units:
+
+```sh
+make all
+```
+
+To run a command for an individual unit:
+
+```sh
+make <command-for-individual-unit>
+```
+
+### 5. Run Unit Tests
+
+```sh
+make tests
+```
+
+### 6. Run Test Coverage
+
+```sh
+make coverage
+```
 
 ## Architecture Overview
 
@@ -57,13 +73,11 @@ persistent storage i.e. MongoDB)
         - Responsible for generating and sending brain scans to Fr-HUB via sockets. Sockets is used for low latency,
           persistent connection, better scalability, more flexibility and for real-time capturing of reports.
         - If brain scan failed to get sent (FrHUB not running or some other issue), it just logs the failed case. If it
-          does get sent, it just logs the acknowledgement sent by FrHUB (We could also integrate queue instead of
-          sending brain scan directly but as per requirement, there is no use for it)
+          does get sent, it just logs the acknowledgement sent by FrHUB.
     - **Server**:
         - Responsible for receiving brain report sent by FrHUb via socket.
-        - It just logs the receviing brain report in success case scenario, if it fails we just log them in FrHUB while
-          FrPACS
-          would keep waiting for new reports (no need to keep the incoming report persistent)
+        - It just logs the received brain report in success case scenario, if it fails we just log them in FrHUB while
+          FrPACS would keep waiting for new reports.
 
 - **Fr-HUB**:
 
@@ -73,13 +87,12 @@ persistent storage i.e. MongoDB)
         - Responsible for fetching brain report from DB ('status' set as 'False' means those which didn't get sent) and
           send it to FrPACS via network socket
         - If brain report failed to get sent (FrPACS not running or some other issue), it just logs the failed case. If
-          it does get sent, it just logs the acknowledgement sent by FrPACS (We could also integrate queue instead of
-          sending brain scan directly but as per requirement, there is no use for it)
+          it does get sent, it just logs and sends the acknowledgement sent by FrPACS.
     - **Server**:
         - Responsible for receiving brain scan sent by FrPACS via network socket saves it to persistent storage (
           MongoDB) with 'report_generated' as 'To Do' so that FrBRAIN knows via this key, which scan to process.
-        - Sends acknolwedgement in success case scenario while it keeps waiting if report is not being sent by FrPACS (
-          if FrPACS is stopped)
+        - Sends acknowledgement in success case scenario while it keeps waiting if report is not being sent by FrPACS (
+          if FrPACS is stopped or any other issue)
 
 - **Fr-BRAIN**:
 
@@ -87,11 +100,10 @@ persistent storage i.e. MongoDB)
   in this unit.
     - **Processor**:
         - Responsible for fetching brain scan from DB that are 'report_generated' as 'To Do', sets this key as 'In
-          Progress' so that no other process can take this exact scan while processing
+          Progress' during processing to avoid duplicate processing.
         - Analyzes them and generates a report
         - Saves the report in MongoDB collection named brain_reports with status as sent 'False' so that FrHUB knows
-          from this key which reports to send, it then
-          gets utilized by FrHUB to send it to FrPACS
+          from this key which reports to send, which then gets utilized by FrHUB to send it to FrPACS
         - After saving the report, it also sets the 'report_generated' key in brain scan collection as 'Done' to avoid
           duplicate processing
 
@@ -100,18 +112,18 @@ persistent storage i.e. MongoDB)
     - Logger - For centralized logging
     - Models - Pydantic models for BrainScan and BrainReport.
     - Utilities: Helper functions for generating/analyzing scans, and saving reports.
-    - Const - For constants and Enums
+    - Config - For constants and Enums
 
 ## Tech Stack/Philosophy:
 
 #### Python:
 
-Python is being used by a lot of big companies and has proven to be reliable in big scale web apps. So I prefer to
-choose something that is proven to work on scale and also having experience in Python makes it better choice for me.
+Python is widely used by a lot of big companies and has proven to be reliable in large scale web apps. It's being used
+in this project for its reliability and my experience with Python
 
 #### Requirements/dependencies
 
-requirements file is in a separate folder because a project can have multiple requirements file. for example, dev
+requirements file is in a because a project can have multiple requirements file. for example, dev
 requirements, etc. So it is better to have all requirements file in one folder.
 
 #### Makefile
@@ -127,23 +139,24 @@ For validations, I have utilized pydantic for function parameters and return typ
 
 Threading is being utilized to ensure that the system can run multiple operations concurrently.
 
-#### Black Formatter and isort
+#### Code Quality Tools
 
-Utilized black code formatter to better format the code as well and also optimized import via isort.
+- **Black**: Used for code formatting.
+- **isort**: Used for optimizing imports.
+-
 
 ## Potential Improvements
 
-- We should use critical credentials like MongoDB in some env file or probably AWS Secrets Manager to improve security.
-- We can introduce batch processing in both FrHUB and FrBRAIN to fetch and process data of scans and reports in batches
-  instead of fetching single which increases our DB calls.
-- We should better implement Multi-Processing for FRBRAIN to create the reports in a much optimized way.
-- Better approach can be implemented in case FrBRAIN server stops and reports are still in In Process so have to update
-  those reports.
-- CAn implement a retry mechanism for handling data/errors gracefully in network communication.
-- We can implement locking mechanism to avoid handling of same data or objects by multiple threads
-- Can implement authentication/encryption for DB connections.
-- Utilize better monitoring and logging tools like ELK, Prometheus, Grafana or Sentry etc.
-- Better and more unit tests for the system
-- We could introduce indexing in columns like scan_id, patient_id, report_generated etc.
+- Store sensitive credentials like MongoDB URI in some env file or probably AWS Secrets Manager.
+- Implement batch processing in Fr-HUB and Fr-BRAIN for fetching/processing to reduce the number of database calls.
+- Implement Multi-Processing in FRBRAIN to create the reports in a much more optimized way.
+- Handle the case, when FrBRAIN server stops and reports are stuck in 'In Process'.
+- Implement a retry mechanism for handling network communication errors gracefully.
+- Implement a locking mechanism to avoid handling of same data by multiple threads.
+- Can Implement authentication/encryption for DB connections.
+- Utilize monitoring and logging tools like ELK, Prometheus, Grafana or Sentry etc.
+- Better and more comprehensive unit test cases for the system.
+- Introduce indexing in columns like 'scan_id', 'patient_id', 'report_generated' etc.
 - I could use docker file but the scope and time of this task is limited so didn't use for this excercise.
-- Can also write more Unit Tests and can separate out each unit test cases as well.
+
+- By addressing these points, the system will become more robust, secure, and maintainable.

@@ -10,7 +10,6 @@ db_manager = DBManager()
 
 
 class BaseDocument(BaseModel):
-    # id: Optional[ObjectId] = Field(None, alias="_id")
     patient_id: int
     scan_id: int
 

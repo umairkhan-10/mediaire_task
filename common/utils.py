@@ -4,7 +4,8 @@ from datetime import datetime
 from common.config import NeuroDataCollections
 from common.db_manager import DBManager
 from common.logger import logger
-from common.models import BrainScan, BrainReport
+from common.models.brain_report import BrainReport
+from common.models.brain_scan import BrainScan
 
 db_manager = DBManager()
 
@@ -73,7 +74,7 @@ def fetch_brain_report() -> dict | None:
     report = db_manager.fetch_one_and_update(
         NeuroDataCollections.brain_reports,
         {"sent": False},
-        {"$set": {"sent": True}},
+        {"sent": True},
     )
     if report:
         report_data = {

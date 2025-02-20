@@ -1,15 +1,19 @@
 import threading
 
 from common.logger import logger
-from processor import main as brain_scan_processor
+from fr_brain.processor import FrBRAINScanProcessor
 
 if __name__ == "__main__":
-    brain_scan_processor_instance = brain_scan_processor()
+    brain_scan_processor_instance = FrBRAINScanProcessor()
+    processor_thread = threading.Thread(target=brain_scan_processor_instance.process_brain_scans)
+    processor_thread.start()
     try:
         while True:
-            # main thread waits here allow processing thread to run
+            # Main thread waits here allowing the processing thread to run
             threading.Event().wait(1)
     except KeyboardInterrupt:
-        # terminate gracefully
+        # Terminate gracefully
         brain_scan_processor_instance.stop()
+        # wait for processes
+        processor_thread.join()
         logger.info("FrBRAIN stopped successfully.")

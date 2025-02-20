@@ -1,7 +1,6 @@
-# DB connection can be separated out in a more centralized place.
-# URI should be fetched from more secure place like env or some Secrets Manager
+import multiprocessing
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from pymongo import MongoClient
 
@@ -11,15 +10,17 @@ from common.logger import logger
 
 class DBManager:
     _instance = None
+    lock = multiprocessing.Lock()
 
     def __new__(cls, mongo_uri: Optional[str] = None, *args, **kwargs):
         """Ensures only one instance of DBManager is created."""
-        if cls._instance is None:
-            cls._instance = super(DBManager, cls).__new__(cls, *args, **kwargs)
-            # URI should be secured in some env or AWS Secrets Manager
-            if not mongo_uri:
-                mongo_uri = os.getenv("MONGO_URI", MONGO_DB_URI)
-            cls._instance.initialize_db(mongo_uri)
+        with cls.lock:
+            if cls._instance is None:
+                cls._instance = super(DBManager, cls).__new__(cls, *args, **kwargs)
+                # URI should be secured in some env or AWS Secrets Manager
+                if not mongo_uri:
+                    mongo_uri = os.getenv("MONGO_URI", MONGO_DB_URI)
+                cls._instance.initialize_db(mongo_uri)
         return cls._instance
 
     # to initialize the database connection
@@ -60,10 +61,21 @@ class DBManager:
         """Fetches and updates a document"""
         try:
             collection = self.db[collection_name]
-            return collection.find_one_and_update(query, update, return_document=True)
+            return collection.find_one_and_update(query, {"$set": update}, return_document=True)
         except Exception as e:
             logger.error(
                 f"Error in fetch_one_and_update of DB Manager {collection_name}: {e}"
+            )
+            return None
+
+    def fetch_all(self, collection_name: str, query: Dict) -> Optional[List]:
+        """Fetches all documents based of query"""
+        try:
+            collection = self.db[collection_name]
+            return list(collection.find(query))
+        except Exception as e:
+            logger.error(
+                f"Error in fetch_all of DB Manager {collection_name}: {e}"
             )
             return None
 

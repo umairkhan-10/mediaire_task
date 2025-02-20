@@ -1,12 +1,10 @@
-import threading
+import multiprocessing
 import time
 
 from common.config import NeuroDataCollections, ReportStatus
 from common.db_manager import DBManager
 from common.logger import logger
 from common.utils import analyze_scan, save_brain_report
-
-db_manager = DBManager()
 
 
 class FrBRAINScanProcessor:
@@ -23,59 +21,64 @@ class FrBRAINScanProcessor:
     def __init__(self) -> None:
         self.running = True
 
+    def fetch_and_process_scan(self, scan_id):
+        """Processes single brain scan and generate report"""
+        db_manager = DBManager()
+        try:
+            # we're udpating a scan to 'In Process' so that other processes knows that this scan in being processed not pick this scan
+            scan = db_manager.fetch_one_and_update(
+                NeuroDataCollections.brain_scans,
+                {"_id": scan_id},
+                {"report_generated": ReportStatus.in_process}
+            )
+            if scan:
+                logger.info(f"Processing scan: {scan_id}")
+                # analyzing the scan data to find lesions
+                scan["report_data"] = analyze_scan(scan["scan_data"])
+                # saving the report to the DB
+                save_report_response = save_brain_report(scan)
+                if save_report_response:
+                    logger.info(
+                        f"Generated and saved report, for scan ID {scan_id}"
+                    )
+                    # after successful process, have to update the status of this scan as 'Done' in DB
+                    db_manager.update(
+                        NeuroDataCollections.brain_scans,
+                        {"_id": scan_id},
+                        {"report_generated": ReportStatus.done}
+                    )
+                    logger.info(f"Finished processing scan: {scan_id}")
+        except Exception as e:
+            # changing report status to 'Error' in case an exception occurs while processing this scan
+            logger.error(f"Error processing this scan {scan_id}: {e}")
+            db_manager.update(
+                NeuroDataCollections.brain_scans,
+                {"_id": scan_id},
+                {"report_generated": ReportStatus.error}
+            )
+
     def process_brain_scans(self) -> None:
-        """Processes the brain scans nd generate report."""
+        """Processes all available brain scans"""
         try:
             while self.running:
-                # fetching only those scans, whose reports are not yet generated and updating the report_generated of scan as "In Process"
-                # so that no other running instance of FrBRAINProcessor can take the same scan to process
-                scan_data = db_manager.fetch_one_and_update(
+                # to avoid issues of pickling
+                db_manager = DBManager()
+                # fetching only those scans, whose reports are not yet generated
+                all_scans = db_manager.fetch_all(
                     NeuroDataCollections.brain_scans,
-                    {"report_generated": ReportStatus.to_do},
-                    {"$set": {"report_generated": ReportStatus.in_process}},
+                    {"report_generated": ReportStatus.to_do}
                 )
-                # Currently, there is no retry mechansim right now if it fails after this step then, status of this report will always be In Process
-                if scan_data:
-                    try:
-                        scan_data["report_data"] = analyze_scan(scan_data["scan_data"])
-                        save_report_response = save_brain_report(scan_data)
-                        if save_report_response:
-                            logger.info(
-                                f"Generated report, for scan ID {scan_data["scan_id"]}"
-                            )
-                            # Update the brain scan to mark it as processed
-                            db_manager.update(
-                                NeuroDataCollections.brain_scans,
-                                {"_id": scan_data["_id"]},
-                                {"report_generated": ReportStatus.done},
-                            )
-                    except Exception as e:
-                        logger.error(f"Error creating brain scan after it's in In Process: {e}")
-                        db_manager.update(
-                            NeuroDataCollections.brain_scans,
-                            {"_id": scan_data["_id"]},  # Update this specific scan only
-                            {"report_generated": ReportStatus.error},
-                        )
+                if all_scans:
+                    # processing scans in multiprocessing environment
+                    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+                        pool.map(self.fetch_and_process_scan, [scan["_id"] for scan in all_scans])
                 else:
                     logger.info("No pending scans to process. Waiting for scan...")
                     # sleep for 5 seconds before checking again as there is no scan
                     time.sleep(5)
-            # means the report scan status is changed to 'In Process' but after that an exception ocurred while geenrating report, we'd have to change it to 'Error'
-
-
-
-
         except Exception as e:
             logger.error(f"Exception in processing brain scans: {e}")
 
     def stop(self) -> None:
         """Stops the processing of brain scans."""
         self.running = False
-
-
-def main():
-    """starting the brain processor in separate thread"""
-    brain_instance = FrBRAINScanProcessor()
-    processing_thread = threading.Thread(target=brain_instance.process_brain_scans)
-    processing_thread.start()
-    return brain_instance
